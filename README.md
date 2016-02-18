@@ -1,4 +1,4 @@
 # AnimalView
 This is an Animal View.
 
-![screenshot](images/screenshot.png)
+![screenshot](images/screenshot.gif)
