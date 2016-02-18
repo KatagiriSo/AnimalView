@@ -59,14 +59,6 @@ class AnimalView: UIView {
         start()
     }
     
-    func drawLine(point:CGPoint, point2:CGPoint) {
-        
-        CGContextMoveToPoint(context, point.x, point.y)
-        CGContextAddLineToPoint(context, point2.x, point2.y)
-        CGContextStrokePath(context)
-    }
-    
-    
     func drawCircle(rect:CGRect) {
         
         CGContextStrokeEllipseInRect(context, rect)
@@ -83,13 +75,6 @@ class AnimalView: UIView {
         
         var r = CGFloat(rand() % 10+10)
         drawCircle(point, radius: r)
-    }
-    
-    class func randumPoint()->(CGPoint) {
-        
-        let x:CGFloat = CGFloat(rand() % 200)
-        let y:CGFloat = CGFloat(rand() % 400)
-        return CGPoint(x: x, y: y)
     }
     
     func update(list:[State]) -> [State] {
@@ -133,7 +118,3 @@ class AnimalView: UIView {
         self.setNeedsDisplay()
     }
 }
-
-
-
-
