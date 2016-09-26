@@ -28,13 +28,18 @@ func randumAddPoint(_ point:CGPoint) -> CGPoint {
 
 typealias Vec = CGPoint
 typealias dVec = CGPoint
-typealias State = (Vec, dVec)
+typealias Radius = CGFloat
+typealias dRadius = CGFloat
+typealias State = (Vec, dVec, Radius, dRadius)
 
-func initialState(_ n:NSInteger, point:CGPoint)->[State] {
+func initialState(_ n:NSInteger, point:CGPoint, radius:Radius)->[State] {
     
     var l:[State] = []
     for _ in 0 ... n {
-        let state:State = State(point, dVec(x:0,y:0))
+        let state:State = State(point,
+                                dVec(x:0,y:0),
+                                radius,
+                                0)
         l.append(state)
     }
     return l
@@ -73,9 +78,8 @@ class AnimalView: UIView {
         drawCircle(r)
     }
     
-    func drawCirclePoint(_ point:CGPoint) {
+    func drawCirclePoint(_ point:CGPoint, r:Radius) {
         
-        let r = CGFloat(arc4random() % 10+10)
         drawCircle(point, radius: r)
     }
     
@@ -85,6 +89,18 @@ class AnimalView: UIView {
         let height = self.frame.height
         
         return list.map { (state:State) -> State in
+            
+//            let dradius = state.3 + CGFloat(arc4random() % 3) - 1
+//            var radius = state.2 + dradius/5
+            let dradius = state.3
+            let radius = state.2
+//            var radius = state.2 + CGFloat(arc4random() % 3) - 1
+//            if radius < 1 {
+//                radius = 1
+//            } else if radius > 10 {
+//                radius = 10
+//            }
+            
             var r = state.0
             var v = state.1
             v = randumAddPoint(v)
@@ -92,7 +108,7 @@ class AnimalView: UIView {
             r.y = r.y + v.y / 5
             if (r.y > height) {r.y = height;v.y = 0} else if (r.y <= 5)    {r.y = 5; v.y = 0}
             if (r.x <= 5)     {r.x = 5; v.x = 0}     else if (r.x > width) {r.x = width;v.x = 0}
-            return (r,v)
+            return (r,v, radius, dradius)
         }
     }
     
@@ -104,12 +120,14 @@ class AnimalView: UIView {
         context?.setStrokeColor(red: 0, green: 0, blue: 1, alpha: 1)
         context?.setLineCap(CGLineCap.round)
         
-        for p in list! { drawCirclePoint(p.0) }
+        for p in list! { drawCirclePoint(p.0, r:p.2) }
     }
     
     func start() {
         
-        self.list  = initialState(100, point:self.center)
+        self.list  = initialState(100,
+                                  point:self.center,
+                                  radius: 1)
         Timer.scheduledTimer(timeInterval: 0.016, target: self, selector: #selector(AnimalView.timeFired(_:)), userInfo: nil, repeats: true)
     }
     
