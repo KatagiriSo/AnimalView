@@ -13,6 +13,8 @@
 		320AA0ED1C75562B008D4E08 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 320AA0EC1C75562B008D4E08 /* Images.xcassets */; };
 		320AA0F01C75562B008D4E08 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 320AA0EE1C75562B008D4E08 /* LaunchScreen.xib */; };
 		320AA0FC1C75562B008D4E08 /* MultiTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 320AA0FB1C75562B008D4E08 /* MultiTestTests.swift */; };
+		32451E221D98E3BE00CA7099 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32451E211D98E3BE00CA7099 /* CoreGraphics.framework */; };
+		32451E241D98E41F00CA7099 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32451E231D98E41F00CA7099 /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +38,8 @@
 		320AA0F51C75562B008D4E08 /* MultiTestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MultiTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		320AA0FA1C75562B008D4E08 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		320AA0FB1C75562B008D4E08 /* MultiTestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiTestTests.swift; sourceTree = "<group>"; };
+		32451E211D98E3BE00CA7099 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		32451E231D98E41F00CA7099 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,6 +47,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				32451E241D98E41F00CA7099 /* QuartzCore.framework in Frameworks */,
+				32451E221D98E3BE00CA7099 /* CoreGraphics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,6 +68,7 @@
 				320AA0E21C75562B008D4E08 /* MultiTest */,
 				320AA0F81C75562B008D4E08 /* MultiTestTests */,
 				320AA0E11C75562B008D4E08 /* Products */,
+				32451E201D98E3BE00CA7099 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -110,6 +117,15 @@
 				320AA0FA1C75562B008D4E08 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		32451E201D98E3BE00CA7099 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				32451E231D98E41F00CA7099 /* QuartzCore.framework */,
+				32451E211D98E3BE00CA7099 /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -161,9 +177,11 @@
 				TargetAttributes = {
 					320AA0DF1C75562B008D4E08 = {
 						CreatedOnToolsVersion = 6.4;
+						LastSwiftMigration = 0800;
 					};
 					320AA0F41C75562B008D4E08 = {
 						CreatedOnToolsVersion = 6.4;
+						LastSwiftMigration = 0800;
 						TestTargetID = 320AA0DF1C75562B008D4E08;
 					};
 				};
@@ -343,6 +361,7 @@
 				INFOPLIST_FILE = MultiTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -353,6 +372,7 @@
 				INFOPLIST_FILE = MultiTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -371,6 +391,7 @@
 				INFOPLIST_FILE = MultiTestTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MultiTest.app/MultiTest";
 			};
 			name = Debug;
@@ -386,6 +407,7 @@
 				INFOPLIST_FILE = MultiTestTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MultiTest.app/MultiTest";
 			};
 			name = Release;
@@ -409,6 +431,7 @@
 				320AA1011C75562B008D4E08 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		320AA1021C75562B008D4E08 /* Build configuration list for PBXNativeTarget "MultiTestTests" */ = {
 			isa = XCConfigurationList;
@@ -417,6 +440,7 @@
 				320AA1041C75562B008D4E08 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

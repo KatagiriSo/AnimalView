@@ -8,16 +8,17 @@
 //
 
 import UIKit
+import QuartzCore
 
-func randumAddPoint(point:CGPoint) -> CGPoint {
+func randumAddPoint(_ point:CGPoint) -> CGPoint {
     
     var x = point.x
     var y = point.y
-    switch (rand() % 4) {
-    case 0: x++
-    case 1: y++
-    case 2: x--
-    case 3: y--
+    switch (arc4random() % 4) {
+    case 0: x += 1
+    case 1: y += 1
+    case 2: x -= 1
+    case 3: y -= 1
     default:
         break
     }
@@ -29,11 +30,11 @@ typealias Vec = CGPoint
 typealias dVec = CGPoint
 typealias State = (Vec, dVec)
 
-func initialState(n:NSInteger, point:CGPoint)->[State] {
+func initialState(_ n:NSInteger, point:CGPoint)->[State] {
     
     var l:[State] = []
-    for (var i = 0;i<n;i++) {
-        var state:State = State(point, dVec(x:0,y:0))
+    for _ in 0 ... n {
+        let state:State = State(point, dVec(x:0,y:0))
         l.append(state)
     }
     return l
@@ -52,32 +53,33 @@ class AnimalView: UIView {
         
         start()
     }
-
-    required init(coder aDecoder: NSCoder) {
+    
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+            start()
+    }
+
+
+    
+    func drawCircle(_ rect:CGRect) {
         
-        start()
+        context?.strokeEllipse(in: rect)
+        context?.strokePath()
     }
     
-    func drawCircle(rect:CGRect) {
+    func drawCircle(_ point:CGPoint, radius:CGFloat) {
         
-        CGContextStrokeEllipseInRect(context, rect)
-        CGContextStrokePath(context)
-    }
-    
-    func drawCircle(point:CGPoint, radius:CGFloat) {
-        
-        let r = CGRectMake(point.x - radius, point.y - radius, radius*2, radius * 2)
+        let r = CGRect(x: point.x - radius, y: point.y - radius, width: radius*2, height: radius * 2)
         drawCircle(r)
     }
     
-    func drawCirclePoint(point:CGPoint) {
+    func drawCirclePoint(_ point:CGPoint) {
         
-        var r = CGFloat(rand() % 10+10)
+        let r = CGFloat(arc4random() % 10+10)
         drawCircle(point, radius: r)
     }
     
-    func update(list:[State]) -> [State] {
+    func update(_ list:[State]) -> [State] {
 
         let width = self.frame.width
         let height = self.frame.height
@@ -94,24 +96,24 @@ class AnimalView: UIView {
         }
     }
     
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
         
         context = UIGraphicsGetCurrentContext()
-        CGContextClearRect(context, rect)
-        CGContextSetLineWidth(context, 3)
-        CGContextSetRGBStrokeColor(context, 0, 0, 1, 1)
-        CGContextSetLineCap(context, kCGLineCapRound )
+        context?.clear(rect)
+        context?.setLineWidth(3)
+        context?.setStrokeColor(red: 0, green: 0, blue: 1, alpha: 1)
+        context?.setLineCap(CGLineCap.round)
         
         for p in list! { drawCirclePoint(p.0) }
     }
     
     func start() {
         
-        self.list  = initialState(10, self.center)
-        NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("timeFired:"), userInfo: nil, repeats: true)
+        self.list  = initialState(100, point:self.center)
+        Timer.scheduledTimer(timeInterval: 0.016, target: self, selector: #selector(AnimalView.timeFired(_:)), userInfo: nil, repeats: true)
     }
     
-    func timeFired(timer:NSTimer) {
+    func timeFired(_ timer:Timer) {
         
         self.list =  update(self.list!)
         self.setNeedsLayout()
