@@ -48,6 +48,9 @@ func initialState(_ n:NSInteger, point:CGPoint, radius:Radius)->[State] {
 
 class AnimalView: UIView {
     
+    var touchmode:Bool = false
+    var touchPoint:CGPoint = CGPoint.zero
+    
     //var context:CGContext?
     var list:[State]? = []
     
@@ -63,8 +66,26 @@ class AnimalView: UIView {
         super.init(coder: aDecoder)
             start()
     }
-
-
+    
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        touchmode = true
+        if let touch:UITouch = touches.first {
+            let point = touch.location(in: self)
+            touchPoint = point
+        }
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if let touch:UITouch = touches.first {
+            let point = touch.location(in: self)
+            touchPoint = point
+        }
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        touchmode = false
+    }
     
     func drawCircle(_ rect:CGRect) {
         
@@ -103,13 +124,35 @@ class AnimalView: UIView {
             
             var r = state.0
             var v = state.1
+
             v = randumAddPoint(v)
+            
+            if touchmode {
+                v = touchEffect(state: state)
+            }
+            
             r.x = r.x + v.x / 5
             r.y = r.y + v.y / 5
             if (r.y > height) {r.y = height;v.y = 0} else if (r.y <= 5)    {r.y = 5; v.y = 0}
             if (r.x <= 5)     {r.x = 5; v.x = 0}     else if (r.x > width) {r.x = width;v.x = 0}
             return (r,v, radius, dradius)
         }
+    }
+    
+    func touchEffect(state:State) -> CGPoint {
+        var v : CGPoint = state.1
+        if (state.0.x > touchPoint.x) {
+            v.x = v.x - 1
+        } else if (state.0.x < touchPoint.x) {
+            v.x = v.x + 1
+        }
+        if (state.0.y > touchPoint.y) {
+            v.y = v.y - 1
+        } else if (state.0.y < touchPoint.y) {
+            v.y = v.y + 1
+        }
+        
+        return v
     }
     
     override func draw(_ rect: CGRect) {
