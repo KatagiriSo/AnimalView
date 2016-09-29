@@ -10,7 +10,7 @@
 import UIKit
 import QuartzCore
 
-func randumAddPoint(_ point:CGPoint) -> CGPoint {
+func randumAddPoint(point:CGPoint) -> CGPoint {
     
     var x = point.x
     var y = point.y
@@ -34,6 +34,45 @@ typealias State = (Vec, dVec, Radius, dRadius)
 typealias LineState = (origin:Vec, speed:dVec, direction:Vec, length:CGFloat, life:CGFloat)
 
 
+extension UITouch {
+    func location(v:UIView) -> CGPoint {
+        return self.locationInView(v)
+    }
+}
+
+extension CGContext {
+    func strokeEllipse(r:CGRect) {
+        CGContextStrokeEllipseInRect(self, r)
+    }
+    
+    func strokePath() {
+        CGContextStrokePath(self)
+    }
+    
+    func move(p:CGPoint) {
+        CGContextMoveToPoint(self, p.x, p.y)
+    }
+    
+    func addLine(toP:CGPoint) {
+        CGContextAddLineToPoint(self, toP.x, toP.y)
+    }
+    
+    func clear(r:CGRect) {
+        CGContextClearRect(self, r)
+    }
+    
+    func setLineWidth(w:CGFloat) {
+        CGContextSetLineWidth(self, 3)
+    }
+    
+    func setStrokeColor(red: CGFloat, green:CGFloat, blue:CGFloat, alpha:CGFloat) {
+        CGContextSetStrokeColor(self, [red,green,blue,alpha])
+    }
+    
+    func setLineCap(index:CGLineCap) {
+        CGContextSetLineCap(self, index)
+    }
+}
 
 class AnimalView: UIView {
     
@@ -57,39 +96,39 @@ class AnimalView: UIView {
     }
     
     
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         touchmode = true
         if let touch:UITouch = touches.first {
-            let point = touch.location(in: self)
+            let point = touch.locationInView(self)
             touchPoint = point
         }
     }
     
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         if let touch:UITouch = touches.first {
-            let point = touch.location(in: self)
+            let point = touch.location(self)
             touchPoint = point
         }
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         touchmode = false
     }
     
     
-    func drawCircle(_ rect:CGRect) {
+    func drawCircle(rect:CGRect) {
         
-        context?.strokeEllipse(in: rect)
+        context?.strokeEllipse(rect)
         context?.strokePath()
     }
     
-    func drawCircle(_ point:CGPoint, radius:CGFloat) {
+    func drawCircle(point:CGPoint, radius:CGFloat) {
         
         let r = CGRect(x: point.x - radius, y: point.y - radius, width: radius*2, height: radius * 2)
         drawCircle(r)
     }
     
-    func drawCirclePoint(_ point:CGPoint, r:Radius) {
+    func drawCirclePoint(point:CGPoint, r:Radius) {
         
         drawCircle(point, radius: r)
     }
@@ -110,13 +149,13 @@ class AnimalView: UIView {
         let fromP = CGPoint(x:fromX, y:fromY)
         let toP = CGPoint(x:toX, y:toY)
         
-        context?.move(to: fromP)
-        context?.addLine(to: toP)
+        context?.move(fromP)
+        context?.addLine(toP)
         context?.strokePath()
         
     }
     
-    func update(_ list:[LineState]) -> [LineState] {
+    func update(list:[LineState]) -> [LineState] {
         
         let width = self.frame.width
         let height = self.frame.height
@@ -171,15 +210,15 @@ class AnimalView: UIView {
         return v
     }
     
-    override func draw(_ rect: CGRect) {
+    override func drawRect(rect: CGRect) {
         
         context = UIGraphicsGetCurrentContext()
         context?.clear(rect)
         context?.setLineWidth(3)
-        context?.setStrokeColor(red: 1, green: 1, blue: 1, alpha: 1)
-        context?.setLineCap(CGLineCap.round)
+        context?.setStrokeColor(1, green: 1, blue: 1, alpha: 1)
+        context?.setLineCap(CGLineCap.Round)
         
-        for p in list! { drawLine(point: p.origin, direction: p.direction, length: p.length)}
+        for p in list! { drawLine(p.origin, direction: p.direction, length: p.length)}
     }
 
     func start() {
@@ -189,17 +228,17 @@ class AnimalView: UIView {
                              direction:CGPoint(x:0,y:1),
                                 length:10,
                                 life:5)
-        Timer.scheduledTimer(timeInterval: 0.016, target: self, selector: #selector(AnimalView.timeFired(_:)), userInfo: nil, repeats: true)
+        NSTimer.scheduledTimerWithTimeInterval(0.016, target: self, selector: #selector(AnimalView.timeFired(_:)), userInfo: nil, repeats: true)
     }
     
-    func timeFired(_ timer:Timer) {
+    func timeFired(timer:NSTimer) {
         
         self.list =  update(self.list!)
         self.setNeedsLayout()
         self.setNeedsDisplay()
     }
     
-    func initialState(_ n:NSInteger, point:CGPoint, direction:CGPoint, length:CGFloat, life:CGFloat)->[LineState]
+    func initialState(n:NSInteger, point:CGPoint, direction:CGPoint, length:CGFloat, life:CGFloat)->[LineState]
     {
         var l:[LineState] = []
         for _ in 0 ... n {
@@ -236,45 +275,45 @@ class AnimalView2: UIView {
         super.init(coder: aDecoder)
             start()
     }
+
     
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         touchmode = true
         if let touch:UITouch = touches.first {
-            let point = touch.location(in: self)
+            let point = touch.location(self)
             touchPoint = point
         }
     }
     
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         if let touch:UITouch = touches.first {
-            let point = touch.location(in: self)
+            let point = touch.location(self)
             touchPoint = point
         }
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         touchmode = false
     }
     
-    func drawCircle(_ rect:CGRect) {
+    func drawCircle(rect:CGRect) {
         
-        context?.strokeEllipse(in: rect)
+        context?.strokeEllipse(rect)
         context?.strokePath()
     }
     
-    func drawCircle(_ point:CGPoint, radius:CGFloat) {
+    func drawCircle(point:CGPoint, radius:CGFloat) {
         
         let r = CGRect(x: point.x - radius, y: point.y - radius, width: radius*2, height: radius * 2)
         drawCircle(r)
     }
     
-    func drawCirclePoint(_ point:CGPoint, r:Radius) {
+    func drawCirclePoint(point:CGPoint, r:Radius) {
         
         drawCircle(point, radius: r)
     }
     
-    func update(_ list:[State]) -> [State] {
+    func update(list:[State]) -> [State] {
 
         let width = self.frame.width
         let height = self.frame.height
@@ -298,7 +337,7 @@ class AnimalView2: UIView {
             v = randumAddPoint(v)
             
             if touchmode {
-                v = touchEffect(state: state)
+                v = touchEffect(state)
             }
             
             r.x = r.x + v.x / 5
@@ -325,13 +364,13 @@ class AnimalView2: UIView {
         return v
     }
     
-    override func draw(_ rect: CGRect) {
+    override func drawRect(rect: CGRect) {
         
         context = UIGraphicsGetCurrentContext()
         context?.clear(rect)
         context?.setLineWidth(3)
-        context?.setStrokeColor(red: 0, green: 0, blue: 1, alpha: 1)
-        context?.setLineCap(CGLineCap.round)
+        context?.setStrokeColor(0, green: 0, blue: 1, alpha: 1)
+        context?.setLineCap(CGLineCap.Round)
         
         for p in list! { drawCirclePoint(p.0, r:p.2) }
     }
@@ -341,17 +380,17 @@ class AnimalView2: UIView {
         self.list  = initialState(100,
                                   point:self.center,
                                   radius: 1)
-        Timer.scheduledTimer(timeInterval: 0.016, target: self, selector: #selector(AnimalView.timeFired(_:)), userInfo: nil, repeats: true)
+        NSTimer.scheduledTimerWithTimeInterval(0.016, target: self, selector: #selector(AnimalView.timeFired(_:)), userInfo: nil, repeats: true)
     }
     
-    func timeFired(_ timer:Timer) {
+    func timeFired(timer:NSTimer) {
         
         self.list =  update(self.list!)
         self.setNeedsLayout()
         self.setNeedsDisplay()
     }
     
-    func initialState(_ n:NSInteger, point:CGPoint, radius:CGFloat)->[State]
+    func initialState(n:NSInteger, point:CGPoint, radius:CGFloat)->[State]
     {
         var l:[State] = []
         for _ in 0 ... n {
