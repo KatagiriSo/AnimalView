@@ -10,6 +10,33 @@
 import UIKit
 import QuartzCore
 
+extension UIColor {
+    static var random:UIColor {
+        let index = arc4random() % 8
+        switch index {
+        case 0:
+            return UIColor.whiteColor()
+        case 1:
+            return UIColor.blueColor()
+        case 2:
+            return UIColor.redColor()
+        case 3:
+            return UIColor.greenColor()
+        case 4:
+            return UIColor.yellowColor()
+        case 5:
+            return UIColor.purpleColor()
+        case 6:
+            return UIColor.brownColor()
+        case 7:
+            return UIColor.orangeColor()
+        default:
+            assert(false, "bad index \(index)")
+            return UIColor.cyanColor()
+        }
+    }
+}
+
 extension UITouch {
     func location(v:UIView) -> CGPoint {
         return self.locationInView(v)
@@ -38,7 +65,7 @@ extension CGContext {
     }
     
     func setLineWidth(w:CGFloat) {
-        CGContextSetLineWidth(self, 3)
+        CGContextSetLineWidth(self, w)
     }
     
     func setStrokeColor(red: CGFloat, green:CGFloat, blue:CGFloat, alpha:CGFloat) {
@@ -76,6 +103,7 @@ protocol State {
     var speed:Vec {get}
     
     func draw(v:AnimalView)
+    
 }
 
 enum StateConfig {
@@ -93,17 +121,19 @@ enum StateConfig {
 }
 
 struct CircleState : State {
+    let uid:String
     let origin:Vec
     let speed:dVec
     let radius:Radius
     let radSpeed:dRadius
+    let color:UIColor
     
-    var tuple:(origin:Vec,speed:dVec,radius:Radius,radSpeed:dRadius) {
-        return (origin:origin, speed:speed, radius:radius, radSpeed:radSpeed)
+    var tuple:(origin:Vec,speed:dVec,radius:Radius,radSpeed:dRadius, color:UIColor, uid:String) {
+        return (origin:origin, speed:speed, radius:radius, radSpeed:radSpeed, color:color, uid:uid)
     }
     
     func draw(v: AnimalView) {
-        v.drawCircle(self.origin, radius: self.radius)
+        v.drawCircle(self.origin, radius: self.radius, color:self.color)
     }
 }
 
@@ -123,13 +153,6 @@ struct LineState : State {
     }
 }
 
-//typealias RadiusState = (origin:Vec, speed:dVec, radius:Radius, radSpeed:dRadius)
-//typealias LineState = (origin:Vec, speed:dVec, direction:Vec, length:CGFloat, life:CGFloat)
-
-
-
-
-
 
 class AnimalView: UIView {
 
@@ -137,7 +160,7 @@ class AnimalView: UIView {
     var touchPoint:CGPoint?
     
     var list:[State]? = []
-    var config:StateConfig = .line
+    var config:StateConfig = .circle
     
     var context:CGContext? = nil
     
@@ -207,16 +230,13 @@ class AnimalView: UIView {
         context?.strokePath()
     }
     
-    func drawCircle(point:CGPoint, radius:CGFloat) {
+    func drawCircle(point:CGPoint, radius:CGFloat, color:UIColor) {
         
         let r = CGRect(x: point.x - radius, y: point.y - radius, width: radius*2, height: radius * 2)
+        CGContextSetStrokeColorWithColor(context, color.CGColor)
         drawCircle(r)
     }
     
-    func drawCirclePoint(point:CGPoint, r:Radius) {
-        
-        drawCircle(point, radius: r)
-    }
     
     func drawLine(point:CGPoint, direction:CGPoint, length:CGFloat) {
         
@@ -292,16 +312,10 @@ class AnimalView: UIView {
         let width = self.frame.width
         let height = self.frame.height
         
-        //            let dradius = state.3 + CGFloat(arc4random() % 3) - 1
-        //            var radius = state.2 + dradius/5
+        let uid = state.uid
+        let color = state.color
         let dradius = state.radSpeed
         let radius = state.radius
-        //            var radius = state.2 + CGFloat(arc4random() % 3) - 1
-        //            if radius < 1 {
-        //                radius = 1
-        //            } else if radius > 10 {
-        //                radius = 10
-        //            }
         
         var r = state.origin
         var v = state.speed
@@ -316,7 +330,7 @@ class AnimalView: UIView {
         r.y = r.y + v.y / 5
         if (r.y > height) {r.y = height;v.y = 0} else if (r.y <= 5)    {r.y = 5; v.y = 0}
         if (r.x <= 5)     {r.x = 5; v.x = 0}     else if (r.x > width) {r.x = width;v.x = 0}
-        return CircleState(origin: r, speed: v, radius:radius, radSpeed:dradius)
+        return CircleState(uid:uid, origin: r, speed: v, radius:radius, radSpeed:dradius, color: color)
     }
     
     func update(list:[State]) -> [State] {
@@ -376,11 +390,14 @@ class AnimalView: UIView {
     func initialState(n:NSInteger, point:CGPoint?, radius:CGFloat)->[State]
     {
         var l:[State] = []
-        for _ in 0 ... n {
-            let state:CircleState = CircleState(origin: point ?? center,
+        for i in 0 ... n {
+            let state:CircleState = CircleState(uid:"\(i)",
+                                                origin: point ?? center,
                                                 speed:dVec(x:0,y:0),
                                                 radius:10,
-                                                radSpeed:0)
+                                                radSpeed:0,
+                                                color:UIColor.random
+                                                )
             l.append(state)
         }
         return l
