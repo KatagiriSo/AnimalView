@@ -98,10 +98,18 @@ func randumAddPoint(point:CGPoint) -> CGPoint {
     return CGPoint(x:x, y:y);
 }
 
+func getRandomPoint(size:CGSize) -> CGPoint {
+    let x = arc4random() % UInt32(size.width)
+    let y = arc4random() % UInt32(size.height)
+    let p = CGPoint(x:CGFloat(x),y:CGFloat(y))
+    return p
+}
+
 typealias Vec = CGPoint
 typealias dVec = CGPoint
 typealias Radius = CGFloat
 typealias dRadius = CGFloat
+
 
 protocol State {
     var uid:String {get}
@@ -112,102 +120,144 @@ protocol State {
     
 }
 
-enum StateConfig {
-    case line,circle
-    
-    func toggle()->StateConfig
-    {
-        switch self {
-        case .line:
-            return .circle
-        case .circle:
-            return .line
-        }
-    }
+public protocol AnimalViewDelegate {
+    func touch(view:AnimalView, uid:String)
 }
 
-struct CircleState : State {
+public class AnimalView: UIView {
     
-    enum Mode {
-        case grouning,floating
-    }
-    
-    let uid:String
-    let origin:Vec
-    let speed:dVec
-    let radius:Radius
-    let radSpeed:dRadius
-    let borderColor:UIColor
-    let fillColor:UIColor
-    let mode:Mode
-    
-    func update(mode:Mode) -> CircleState
-    {
+    public func makeCircle(uid:String, radius:CGFloat, color:UIColor, borderColor:UIColor = UIColor.whiteColor(), mode:CircleState.Mode = CircleState.Mode.floating) -> CircleState {
         let c = CircleState(uid: uid,
-                    origin: origin,
-                    speed: speed,
-                    radius: radius,
-                    radSpeed: radSpeed,
-                    borderColor: borderColor,
-                    fillColor: fillColor,
-                    mode: mode)
+                            origin: getRandomPoint(self.frame.size),
+                            speed: CGPointZero,
+                            radius: radius,
+                            radSpeed: 0,
+                            borderColor: borderColor,
+                            fillColor: color,
+                            mode: .floating)
         return c
     }
     
-    func contain(point:CGPoint) -> Bool {
-        let d2 =  pow(origin.x-point.x,2) + pow(origin.y - point.y,2)
-        let r2 = pow(radius,2)
-        return d2 <= r2
-    }
-    
-    var tuple:(origin:Vec,speed:dVec,radius:Radius,radSpeed:dRadius, borderColor:UIColor, fillColor:UIColor, uid:String, mode:Mode) {
-        return (origin:origin, speed:speed, radius:radius, radSpeed:radSpeed, borderColor:borderColor, fillColor:fillColor, uid:uid, mode:mode)
-    }
-    
-    func draw(v: AnimalView) {
-        v.drawCircle(self,origin:self.origin, radius: self.radius, borderColor: self.borderColor, fillColor: self.fillColor);
-    }
-}
+    public struct CircleState : State {
+        
 
-struct LineState : State {
-    let uid:String
-    let origin:Vec
-    let speed:dVec
-    let direction:Vec
-    let length:CGFloat
-    let life:CGFloat
-    
-    var tuple:(origin:Vec, speed:dVec, direction:Vec, length:CGFloat, life:CGFloat) {
-        return (origin:origin, speed:speed, direction:direction, length:length, life:life)
+        
+        public enum Mode {
+            case grouning,floating
+        }
+        
+        let uid:String
+        let origin:Vec
+        let speed:dVec
+        let radius:Radius
+        let radSpeed:dRadius
+        let borderColor:UIColor
+        let fillColor:UIColor
+        let mode:Mode
+        
+
+        
+        func update(mode:Mode) -> CircleState
+        {
+            let c = CircleState(uid: uid,
+                                origin: origin,
+                                speed: speed,
+                                radius: radius,
+                                radSpeed: radSpeed,
+                                borderColor: borderColor,
+                                fillColor: fillColor,
+                                mode: mode)
+            return c
+        }
+        
+        func contain(point:CGPoint) -> Bool {
+            let d2 =  pow(origin.x-point.x,2) + pow(origin.y - point.y,2)
+            let r2 = pow(radius,2)
+            return d2 <= r2
+        }
+        
+        var tuple:(origin:Vec,speed:dVec,radius:Radius,radSpeed:dRadius, borderColor:UIColor, fillColor:UIColor, uid:String, mode:Mode) {
+            return (origin:origin, speed:speed, radius:radius, radSpeed:radSpeed, borderColor:borderColor, fillColor:fillColor, uid:uid, mode:mode)
+        }
+        
+        func draw(v: AnimalView) {
+            v.drawCircle(self,origin:self.origin, radius: self.radius, borderColor: self.borderColor, fillColor: self.fillColor);
+        }
     }
     
-    func draw(v:AnimalView) {
-        v.drawLine(self.origin, direction: self.direction, length: self.length)
+    struct LineState : State {
+        let uid:String
+        let origin:Vec
+        let speed:dVec
+        let direction:Vec
+        let length:CGFloat
+        let life:CGFloat
+        
+        var tuple:(origin:Vec, speed:dVec, direction:Vec, length:CGFloat, life:CGFloat) {
+            return (origin:origin, speed:speed, direction:direction, length:length, life:life)
+        }
+        
+        func draw(v:AnimalView) {
+            v.drawLine(self.origin, direction: self.direction, length: self.length)
+        }
     }
-}
 
-
-class AnimalView: UIView {
+    
+    public enum StateConfig {
+        case line,circle
+        
+        func toggle()->StateConfig
+        {
+            switch self {
+            case .line:
+                return .circle
+            case .circle:
+                return .line
+            }
+        }
+    }
 
     var touchmode:Bool = false
     var touchPoint:CGPoint?
     
     var list:[State]? = []
-    var config:StateConfig = .circle
+    public var config:StateConfig = .circle
     
     var context:CGContext? = nil
     var currentGrow:CircleState? = nil
     var currentCatch:CircleState? = nil
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        start()
+    let timeinterval = 0.016
+    
+    public var animalDelegate:AnimalViewDelegate?
+    
+    public func deleteAnimal(uid:String) {
+        self.list = self.list?.filter({ s in
+            if s.uid != uid {
+                return true
+            } else {
+                return false
+            }
+        })
     }
     
-    required init?(coder aDecoder: NSCoder) {
+    public func updateAnimalState(uid:String, mode:CircleState.Mode) {
+        self.list = list?.map({ s  in
+            if s.uid == uid {
+                if let s = s as? CircleState {
+                    return s.update(mode)
+                }
+            }
+            return s
+        })
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+    
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        start()
     }
     
     func setup() {
@@ -219,15 +269,14 @@ class AnimalView: UIView {
         }
     }
     
-    func start() {
+    public func start() {
         
         self.multipleTouchEnabled = true
         
-        setup()
-        NSTimer.scheduledTimerWithTimeInterval(0.016, target: self, selector: #selector(AnimalView.timeFired(_:)), userInfo: nil, repeats: true)
+        NSTimer.scheduledTimerWithTimeInterval(timeinterval, target: self, selector: #selector(AnimalView.timeFired(_:)), userInfo: nil, repeats: true)
     }
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override public func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         touchmode = true
         if let touch:UITouch = touches.first {
             let point = touch.locationInView(self)
@@ -239,6 +288,7 @@ class AnimalView: UIView {
                 if let s = s as? CircleState {
                     if s.contain(touchPoint) {
                         currentCatch = s
+                        animalDelegate?.touch(self, uid: s.uid)
                     }
                 }
             }
@@ -270,14 +320,15 @@ class AnimalView: UIView {
 
     }
     
-    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    
+    override public func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         if let touch:UITouch = touches.first {
             let point = touch.location(self)
             touchPoint = point
         }
     }
     
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    override public func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         touchmode = false
         currentCatch = nil
     }
@@ -455,7 +506,7 @@ class AnimalView: UIView {
         return v
     }
     
-    override func drawRect(rect: CGRect) {
+    override public func drawRect(rect: CGRect) {
         
         context = UIGraphicsGetCurrentContext()
         context?.clear(rect)
@@ -508,14 +559,56 @@ class AnimalView: UIView {
         return l
     }
     
-    func addCircle(uid:String,
-                   point:CGPoint,
-                   radius:Radius,
+    
+    public func addCircle(state:CircleState) {
+        list?.append(state)
+    }
+    
+
+    
+    
+    public func addCircle(uid:String,
+                   point:CGPoint?,
+                   radius:CGFloat?,
                    borderColor:UIColor,
                    fillColor:UIColor,
-                   mode:CircleState.Mode) -> CircleState {
-        let state:CircleState = CircleState(uid: uid, origin: point, speed: dVec(x:0,y:0), radius: radius, radSpeed: 0, borderColor: borderColor,fillColor:fillColor,  mode: mode)
+                   mode:CircleState.Mode?) -> CircleState {
+        
+        var p:CGPoint
+        if point == nil {
+            p = getRandomPoint(self.frame.size)
+        } else {
+            p = point!
+        }
+        
+        let r:CGFloat = {
+            if let radius = radius {
+                return radius
+            } else {
+                return 10
+            }
+        }()
+        
+        let mode:CircleState.Mode = {
+            if let mode = mode {
+                return mode
+            } else {
+                return CircleState.Mode.floating
+            }
+        }()
+        
+        let state:CircleState = CircleState(uid: uid,
+                                            origin: p,
+                                            speed: CGPoint(x:0,y:0),
+                                            radius: r,
+                                            radSpeed: 0,
+                                            borderColor: borderColor,
+                                            fillColor:fillColor,
+                                            mode: mode)
         list?.append(state)
         return state
     }
+    
+
+
 }

@@ -15,6 +15,7 @@
 		320AA0FC1C75562B008D4E08 /* MultiTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 320AA0FB1C75562B008D4E08 /* MultiTestTests.swift */; };
 		32451E221D98E3BE00CA7099 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32451E211D98E3BE00CA7099 /* CoreGraphics.framework */; };
 		32451E241D98E41F00CA7099 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 32451E231D98E41F00CA7099 /* QuartzCore.framework */; };
+		4A68C6A11DA69A3100A62F39 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A68C6A01DA69A3100A62F39 /* ViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +41,7 @@
 		320AA0FB1C75562B008D4E08 /* MultiTestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiTestTests.swift; sourceTree = "<group>"; };
 		32451E211D98E3BE00CA7099 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		32451E231D98E41F00CA7099 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		4A68C6A01DA69A3100A62F39 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +89,7 @@
 				320AA0E51C75562B008D4E08 /* AppDelegate.swift */,
 				320AA0E71C75562B008D4E08 /* AnimalView.swift */,
 				320AA0E91C75562B008D4E08 /* Main.storyboard */,
+				4A68C6A01DA69A3100A62F39 /* ViewController.swift */,
 				320AA0EC1C75562B008D4E08 /* Images.xcassets */,
 				320AA0EE1C75562B008D4E08 /* LaunchScreen.xib */,
 				320AA0E31C75562B008D4E08 /* Supporting Files */,
@@ -234,6 +237,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4A68C6A11DA69A3100A62F39 /* ViewController.swift in Sources */,
 				320AA0E81C75562B008D4E08 /* AnimalView.swift in Sources */,
 				320AA0E61C75562B008D4E08 /* AppDelegate.swift in Sources */,
 			);
