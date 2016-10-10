@@ -134,16 +134,16 @@ public class AnimalView: UIView {
                             radSpeed: 0,
                             borderColor: borderColor,
                             fillColor: color,
-                            mode: .floating)
+                            mode: mode)
         return c
     }
     
-    public struct CircleState : State {
+    public struct CircleState : State  {
         
 
         
         public enum Mode {
-            case grouning,floating
+            case growing,floating
         }
         
         let uid:String
@@ -157,18 +157,24 @@ public class AnimalView: UIView {
         
 
         
-        func update(mode:Mode) -> CircleState
+        func update(origin:Vec? = nil, speed:dVec? = nil, radius:Radius? = nil, radSpeed:dRadius? = nil, borderColor:UIColor? = nil, fillColor:UIColor? = nil, mode:Mode? = nil) -> CircleState
         {
+            
             let c = CircleState(uid: uid,
-                                origin: origin,
-                                speed: speed,
-                                radius: radius,
-                                radSpeed: radSpeed,
-                                borderColor: borderColor,
-                                fillColor: fillColor,
-                                mode: mode)
+                                origin: origin ?? self.origin,
+                                speed: speed ?? self.speed,
+                                radius: radius ?? self.radius,
+                                radSpeed: radSpeed ?? self.radSpeed,
+                                borderColor: borderColor ?? self.borderColor,
+                                fillColor: fillColor ?? self.fillColor,
+                                mode: mode ?? self.mode)
             return c
         }
+        
+//        func update(mode:Mode) -> CircleState
+//        {
+//            return update(nil, speed: nil, radius: nil, radSpeed: nil, borderColor: nil, fillColor: nil, mode: mode)
+//        }
         
         func contain(point:CGPoint) -> Bool {
             let d2 =  pow(origin.x-point.x,2) + pow(origin.y - point.y,2)
@@ -245,7 +251,7 @@ public class AnimalView: UIView {
         self.list = list?.map({ s  in
             if s.uid == uid {
                 if let s = s as? CircleState {
-                    return s.update(mode)
+                    return s.update(mode:mode)
                 }
             }
             return s
@@ -276,6 +282,24 @@ public class AnimalView: UIView {
         NSTimer.scheduledTimerWithTimeInterval(timeinterval, target: self, selector: #selector(AnimalView.timeFired(_:)), userInfo: nil, repeats: true)
     }
     
+    public func getCircleState(uid:String) -> CircleState? {
+        guard let list = list else {
+            return nil
+        }
+        
+        let filtered = list.filter { (s) -> Bool in
+            return s.uid == uid
+        }
+        
+        if filtered.count == 0 {
+            return nil
+        }
+        
+        return filtered.first as? CircleState
+    }
+    
+
+    
     override public func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         touchmode = true
         if let touch:UITouch = touches.first {
@@ -302,7 +326,7 @@ public class AnimalView: UIView {
                 self.list = list.map({ (s:State) -> State in
                     if s.uid == current.uid {
                         if let s = s as? CircleState {
-                            return s.update(.floating)
+                            return s.update(mode:.floating)
                         }
                     }
                     return s
@@ -310,7 +334,7 @@ public class AnimalView: UIView {
                 currentGrow = nil
                 return
             }
-            self.currentGrow = addCircle("\(list?.count)", point: self.center, radius: 10,borderColor: UIColor.random, fillColor: UIColor.random, mode: .grouning)
+            self.currentGrow = addCircle("\(list?.count)", point: self.center, radius: 10,borderColor: UIColor.random, fillColor: UIColor.random, mode: .growing) 
         case 3...5:
             config = config.toggle()
             setup()
@@ -451,7 +475,7 @@ public class AnimalView: UIView {
             v = CGPoint(x:0,y:0)
         }
         
-        if mode == .grouning {
+        if mode == .growing {
             dradius = 0.5 + 10 * 100 / (radius*radius)
 
             
@@ -559,8 +583,12 @@ public class AnimalView: UIView {
         return l
     }
     
-    
     public func addCircle(state:CircleState) {
+        
+        if let state = getCircleState(state.uid) {
+            deleteAnimal(state.uid)
+        }
+        
         list?.append(state)
     }
     
