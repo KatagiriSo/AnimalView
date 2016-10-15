@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, AnimalViewDelegate {
+class ViewController: UIViewController, AnimalViewDelegate, UITextFieldDelegate {
 
     @IBOutlet weak var aView: AnimalView!
     @IBOutlet weak var radiusTextField: UITextField!
@@ -47,6 +47,7 @@ class ViewController: UIViewController, AnimalViewDelegate {
     override func viewDidLoad() {
 
         super.viewDidLoad()
+        
 
 
         // Do any additional setup after loading the view.
@@ -131,6 +132,14 @@ class ViewController: UIViewController, AnimalViewDelegate {
         self.present(av, animated: true, completion: nil)
         
     }
+    
+     public func textFieldShouldReturn(_ textField: UITextField) -> Bool // called when 'return' key pressed. return NO to ignore.
+    {
+        textField.resignFirstResponder()
+        return true
+    }
+
+
 
     /*
     // MARK: - Navigation
