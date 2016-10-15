@@ -48,22 +48,10 @@ class ViewController: UIViewController, AnimalViewDelegate, UITextFieldDelegate 
 
         super.viewDidLoad()
         
-
-
-        // Do any additional setup after loading the view.
-
-        
-//        let c1 = self.aView.makeCircle("ab", radius: 30, color: UIColor.blueColor())
-//        let c2 = self.aView.makeCircle("fdd", radius: 10, color: UIColor.redColor())
-//        let c3 = self.aView.makeCircle("sdsdf", radius: 20, color: UIColor.greenColor())
-//        
-//        self.aView.addCircle(c1)
-//        self.aView.addCircle(c2)
-//        self.aView.addCircle(c3)
+        // アニマルビューのデリゲートを設定してスタートさせてください。
         self.aView.animalDelegate = self
         self.aView.start()
-        
-        
+  
     }
     
     
@@ -89,8 +77,12 @@ class ViewController: UIViewController, AnimalViewDelegate, UITextFieldDelegate 
         let uid = uidText.text ?? "ADDUID\(count)"
         count = count + 1
         
+        // 任意のuid、色、半径を指定してマルを作ります。
         let s = self.aView.makeCircle(uid: uid,
-                                      radius: r, color: uicolor)
+                                      radius: r,
+                                      color: uicolor)
+        
+        // マルをビューに追加します。
         self.aView.addCircle(state: s)
         
         
@@ -103,15 +95,21 @@ class ViewController: UIViewController, AnimalViewDelegate, UITextFieldDelegate 
         // Dispose of any resources that can be recreated.
     }
     
+    // アニマルビューのデリゲート
     func touch(view: AnimalView, uid: String) {
+        
         print("touch \(uid)")
         let av = UIAlertController(title: "touch", message: uid, preferredStyle: .alert)
+        
+        // 状態を変えたいときはupdate(mode:.growing)したものを追加してください。そのuidが置き換わります。
         av.addAction(UIAlertAction(title: "growing", style: .default, handler: { (UIAlertAction) in
             if let state = self.aView.getCircleState(uid: uid) {
                 let s = state.update(mode:.growing)
                 self.aView.addCircle(state: s)
             }
         }))
+        
+        
         av.addAction(UIAlertAction(title: "floating", style: .default, handler: { (UIAlertAction) in
             if let state = self.aView.getCircleState(uid: uid) {
                 let s = state.update(mode:.floating)
@@ -119,6 +117,7 @@ class ViewController: UIViewController, AnimalViewDelegate, UITextFieldDelegate 
             }
         }))
         
+        // 消したい時 deleteAnimal
         av.addAction(UIAlertAction(title: "delete", style: .default, handler: { (UIAlertAction) in
             if let state = self.aView.getCircleState(uid: uid) {
                 let s = state.update(mode:.floating)
