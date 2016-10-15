@@ -15,72 +15,65 @@ extension UIColor {
         let index = arc4random() % 8
         switch index {
         case 0:
-            return UIColor.whiteColor()
+            return UIColor.white
         case 1:
-            return UIColor.blueColor()
+            return UIColor.blue
         case 2:
-            return UIColor.redColor()
+            return UIColor.red
         case 3:
-            return UIColor.greenColor()
+            return UIColor.green
         case 4:
-            return UIColor.yellowColor()
+            return UIColor.yellow
         case 5:
-            return UIColor.purpleColor()
+            return UIColor.purple
         case 6:
-            return UIColor.brownColor()
+            return UIColor.brown
         case 7:
-            return UIColor.orangeColor()
+            return UIColor.orange
         default:
             assert(false, "bad index \(index)")
-            return UIColor.cyanColor()
+            return UIColor.cyan
         }
     }
 }
 
-extension UITouch {
-    func location(v:UIView) -> CGPoint {
-        return self.locationInView(v)
-    }
-}
+//extension UITouch {
+//    func location(v:UIView) -> CGPoint {
+//        return self.location(in: v)
+//    }
+//}
 
-extension CGContext {
-    
-    func fillEllipse(r:CGRect) {
-        CGContextFillEllipseInRect(self, r)
-    }
-    
-    func strokeEllipse(r:CGRect) {
-        CGContextStrokeEllipseInRect(self, r)
-    }
-    
-    func strokePath() {
-        CGContextStrokePath(self)
-    }
-    
-    func move(p:CGPoint) {
-        CGContextMoveToPoint(self, p.x, p.y)
-    }
-    
-    func addLine(toP:CGPoint) {
-        CGContextAddLineToPoint(self, toP.x, toP.y)
-    }
-    
-    func clear(r:CGRect) {
-        CGContextClearRect(self, r)
-    }
-    
-    func setLineWidth(w:CGFloat) {
-        CGContextSetLineWidth(self, w)
-    }
-    
-    func setStrokeColor(red: CGFloat, green:CGFloat, blue:CGFloat, alpha:CGFloat) {
-        CGContextSetStrokeColor(self, [red,green,blue,alpha])
-    }
-    
-    func setLineCap(index:CGLineCap) {
-        CGContextSetLineCap(self, index)
-    }
-}
+//extension CGContext {
+//    
+//    func fillEllipse(r:CGRect) {
+//        self.fillEllipse(in: r)
+//    }
+//    
+//    func strokeEllipse(r:CGRect) {
+//        self.strokeEllipse(in: r)
+//    }
+//    
+//    func strokePath() {
+//        self.strokePath()
+//    }
+//    
+//
+//    func clear(r:CGRect) {
+//        self.clear(r)
+//    }
+//    
+//    func setLineWidth(w:CGFloat) {
+//        self.setLineWidth(w)
+//    }
+//    
+//    func setStrokeColor(red: CGFloat, green:CGFloat, blue:CGFloat, alpha:CGFloat) {
+//        self.setStrokeColor([red,green,blue,alpha])
+//    }
+//    
+//    func setLineCap(index:CGLineCap) {
+//        self.setLineCap(index)
+//    }
+//}
 
 func randumAddPoint(point:CGPoint) -> CGPoint {
     
@@ -126,10 +119,10 @@ public protocol AnimalViewDelegate {
 
 public class AnimalView: UIView {
     
-    public func makeCircle(uid:String, radius:CGFloat, color:UIColor, borderColor:UIColor = UIColor.whiteColor(), mode:CircleState.Mode = CircleState.Mode.floating) -> CircleState {
+    public func makeCircle(uid:String, radius:CGFloat, color:UIColor, borderColor:UIColor = UIColor.white, mode:CircleState.Mode = CircleState.Mode.floating) -> CircleState {
         let c = CircleState(uid: uid,
-                            origin: getRandomPoint(self.frame.size),
-                            speed: CGPointZero,
+                            origin: getRandomPoint(size: self.frame.size),
+                            speed: CGPoint.zero,
                             radius: radius,
                             radSpeed: 0,
                             borderColor: borderColor,
@@ -187,7 +180,7 @@ public class AnimalView: UIView {
         }
         
         func draw(v: AnimalView) {
-            v.drawCircle(self,origin:self.origin, radius: self.radius, borderColor: self.borderColor, fillColor: self.fillColor);
+            v.drawCircle(state: self,origin:self.origin, radius: self.radius, borderColor: self.borderColor, fillColor: self.fillColor);
         }
     }
     
@@ -204,7 +197,7 @@ public class AnimalView: UIView {
         }
         
         func draw(v:AnimalView) {
-            v.drawLine(self.origin, direction: self.direction, length: self.length)
+            v.drawLine(point: self.origin, direction: self.direction, length: self.length)
         }
     }
 
@@ -269,17 +262,17 @@ public class AnimalView: UIView {
     func setup() {
         switch config {
         case .circle:
-            list = initialState(1, point: touchPoint, radius:1)
+            list = initialState(n: 1, point: touchPoint, radius:1)
         case .line:
-            list = initialState(100, point: touchPoint, direction: CGPoint(x:10,y:1), length: 10, life: 5)
+            list = initialState(n: 100, point: touchPoint, direction: CGPoint(x:10,y:1), length: 10, life: 5)
         }
     }
     
     public func start() {
         
-        self.multipleTouchEnabled = true
+        self.isMultipleTouchEnabled = true
         
-        NSTimer.scheduledTimerWithTimeInterval(timeinterval, target: self, selector: #selector(AnimalView.timeFired(_:)), userInfo: nil, repeats: true)
+        Timer.scheduledTimer(timeInterval: timeinterval, target: self, selector: #selector(AnimalView.timeFired(timer:)), userInfo: nil, repeats: true)
     }
     
     public func getCircleState(uid:String) -> CircleState? {
@@ -299,20 +292,19 @@ public class AnimalView: UIView {
     }
     
 
-    
-    override public func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         touchmode = true
         if let touch:UITouch = touches.first {
-            let point = touch.locationInView(self)
+            let point = touch.location(in: self)
             touchPoint = point
         }
         
         if let list = list, let touchPoint = touchPoint {
             for s in list {
                 if let s = s as? CircleState {
-                    if s.contain(touchPoint) {
+                    if s.contain(point: touchPoint) {
                         currentCatch = s
-                        animalDelegate?.touch(self, uid: s.uid)
+                        animalDelegate?.touch(view: self, uid: s.uid)
                     }
                 }
             }
@@ -334,7 +326,7 @@ public class AnimalView: UIView {
                 currentGrow = nil
                 return
             }
-            self.currentGrow = addCircle("\(list?.count)", point: self.center, radius: 10,borderColor: UIColor.random, fillColor: UIColor.random, mode: .growing) 
+            self.currentGrow = addCircle(uid: "\(list?.count)", point: self.center, radius: 10,borderColor: UIColor.random, fillColor: UIColor.random, mode: .growing) 
         case 3...5:
             config = config.toggle()
             setup()
@@ -344,15 +336,14 @@ public class AnimalView: UIView {
 
     }
     
-    
-    override public func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    public override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let touch:UITouch = touches.first {
-            let point = touch.location(self)
+            let point = touch.location(in: self)
             touchPoint = point
         }
     }
     
-    override public func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+    public override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         touchmode = false
         currentCatch = nil
     }
@@ -360,8 +351,8 @@ public class AnimalView: UIView {
     
     func drawCircle(rect:CGRect) {
         
-        context?.fillEllipse(rect)
-        context?.strokeEllipse(rect)
+        context?.fillEllipse(in:rect)
+        context?.strokeEllipse(in: rect)
         context?.strokePath()
     }
     
@@ -371,16 +362,16 @@ public class AnimalView: UIView {
         
         if let currentCatch = currentCatch {
             if currentCatch.uid == state.uid {
-                CGContextSetStrokeColorWithColor(context, borderColor.CGColor)
+                context!.setStrokeColor(borderColor.cgColor)
             } else {
-                CGContextSetStrokeColorWithColor(context, fillColor.CGColor)
+                context!.setStrokeColor(fillColor.cgColor)
             }
         } else {
-            CGContextSetStrokeColorWithColor(context, fillColor.CGColor)
+            context!.setStrokeColor(fillColor.cgColor)
         }
         
-        CGContextSetFillColorWithColor(context, fillColor.CGColor)
-        drawCircle(r)
+        context!.setFillColor(fillColor.cgColor)
+        drawCircle(rect: r)
     }
     
     
@@ -400,19 +391,19 @@ public class AnimalView: UIView {
         let fromP = CGPoint(x:fromX, y:fromY)
         let toP = CGPoint(x:toX, y:toY)
         
-        context?.move(fromP)
-        context?.addLine(toP)
+        context?.move(to: fromP)
+        context?.addLine(to: toP)
         context?.strokePath()
         
     }
     
     func update(state:State) -> State {
         if let state = state as? LineState {
-            return update(state)
+            return update(state:state)
         }
         
         if let state = state as? CircleState {
-            return update(state)
+            return update(state:state)
         }
         return state
     }
@@ -439,10 +430,10 @@ public class AnimalView: UIView {
         
         
         
-        v = randumAddPoint(v)
+        v = randumAddPoint(point: v)
         
         if touchmode {
-            v = touchEffect(state, touchPoint: touchPoint ?? center)
+            v = touchEffect(state: state, touchPoint: touchPoint ?? center)
         }
         
         r.x = r.x + v.x / 5
@@ -470,7 +461,7 @@ public class AnimalView: UIView {
         var v = state.speed
         
         if state.mode == .floating {
-            v = randumAddPoint(v)
+            v = randumAddPoint(point: v)
         } else {
             v = CGPoint(x:0,y:0)
         }
@@ -486,7 +477,7 @@ public class AnimalView: UIView {
         radius = radius + dradius / 5
         
         if touchmode {
-            v = touchEffect(state, touchPoint: touchPoint ?? center)
+            v = touchEffect(state: state, touchPoint: touchPoint ?? center)
         }
         
         var m:CGFloat = 5
@@ -530,22 +521,22 @@ public class AnimalView: UIView {
         return v
     }
     
-    override public func drawRect(rect: CGRect) {
+    override public func draw(_ rect: CGRect) {
         
         context = UIGraphicsGetCurrentContext()
         context?.clear(rect)
         context?.setLineWidth(3)
-        context?.setStrokeColor(1, green: 1, blue: 1, alpha: 1)
-        context?.setLineCap(CGLineCap.Round)
+        context?.setStrokeColor(red: 1, green: 1, blue: 1, alpha: 1)
+        context?.setLineCap(CGLineCap.round)
         
-        for p in list! { p.draw(self)}
+        for p in list! { p.draw(v: self)}
     }
 
 
     
-    func timeFired(timer:NSTimer) {
+    func timeFired(timer:Timer) {
         
-        self.list =  update(self.list!)
+        self.list =  update(list: self.list!)
         self.setNeedsLayout()
         self.setNeedsDisplay()
     }
@@ -585,8 +576,8 @@ public class AnimalView: UIView {
     
     public func addCircle(state:CircleState) {
         
-        if let state = getCircleState(state.uid) {
-            deleteAnimal(state.uid)
+        if let state = getCircleState(uid: state.uid) {
+            deleteAnimal(uid: state.uid)
         }
         
         list?.append(state)
@@ -604,7 +595,7 @@ public class AnimalView: UIView {
         
         var p:CGPoint
         if point == nil {
-            p = getRandomPoint(self.frame.size)
+            p = getRandomPoint(size: self.frame.size)
         } else {
             p = point!
         }

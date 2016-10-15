@@ -32,14 +32,15 @@ class ViewController: UIViewController, AnimalViewDelegate {
     @IBOutlet weak var greenColorText: UILabel!
     @IBOutlet weak var redColorText: UILabel!
     
-    @IBAction func bluesliderchanged(sender: AnyObject) {
+    @IBAction func bluesliderchanged(_ sender: AnyObject) {
         bluecolorText.text = "\(blueslider.value)"
     }
     
-    @IBAction func greensliderchanged(sender: AnyObject) {
+    @IBAction func greensliderchanged(_ sender: AnyObject) {
         greenColorText.text = "\(greenslider.value)"
     }
-    @IBAction func redsliderchanged(sender: AnyObject) {
+
+    @IBAction func redsliderchanged(_ sender: AnyObject) {
         redColorText.text = "\(redslider.value)"
     }
     
@@ -64,7 +65,8 @@ class ViewController: UIViewController, AnimalViewDelegate {
         
     }
     
-    @IBAction func addButtonPudhed(sender: AnyObject) {
+    
+    @IBAction func addButtonPudhed(_ sender: AnyObject) {
         
         guard let rad = radiusTextField.text else {
             return
@@ -74,11 +76,7 @@ class ViewController: UIViewController, AnimalViewDelegate {
             return
         }
     
-        guard let r:CGFloat = CGFloat(r_) else {
-            return
-        }
-    
-        
+        let r:CGFloat = CGFloat(r_)
 
         
         let red =  CGFloat(self.redslider.value / 255.0)
@@ -90,9 +88,9 @@ class ViewController: UIViewController, AnimalViewDelegate {
         let uid = uidText.text ?? "ADDUID\(count)"
         count = count + 1
         
-        let s = self.aView.makeCircle(uid,
+        let s = self.aView.makeCircle(uid: uid,
                                       radius: r, color: uicolor)
-        self.aView.addCircle(s)
+        self.aView.addCircle(state: s)
         
         
     }
@@ -106,31 +104,31 @@ class ViewController: UIViewController, AnimalViewDelegate {
     
     func touch(view: AnimalView, uid: String) {
         print("touch \(uid)")
-        let av = UIAlertController(title: "touch", message: uid, preferredStyle: .Alert)
-        av.addAction(UIAlertAction(title: "growing", style: .Default, handler: { (UIAlertAction) in
-            if let state = self.aView.getCircleState(uid) {
+        let av = UIAlertController(title: "touch", message: uid, preferredStyle: .alert)
+        av.addAction(UIAlertAction(title: "growing", style: .default, handler: { (UIAlertAction) in
+            if let state = self.aView.getCircleState(uid: uid) {
                 let s = state.update(mode:.growing)
-                self.aView.addCircle(s)
+                self.aView.addCircle(state: s)
             }
         }))
-        av.addAction(UIAlertAction(title: "floating", style: .Default, handler: { (UIAlertAction) in
-            if let state = self.aView.getCircleState(uid) {
+        av.addAction(UIAlertAction(title: "floating", style: .default, handler: { (UIAlertAction) in
+            if let state = self.aView.getCircleState(uid: uid) {
                 let s = state.update(mode:.floating)
-                self.aView.addCircle(s)
+                self.aView.addCircle(state: s)
             }
         }))
         
-        av.addAction(UIAlertAction(title: "delete", style: .Default, handler: { (UIAlertAction) in
-            if let state = self.aView.getCircleState(uid) {
+        av.addAction(UIAlertAction(title: "delete", style: .default, handler: { (UIAlertAction) in
+            if let state = self.aView.getCircleState(uid: uid) {
                 let s = state.update(mode:.floating)
-                self.aView.deleteAnimal(s.uid)
+                self.aView.deleteAnimal(uid: s.uid)
             }
         }))
         
-        av.addAction(UIAlertAction(title: "cancel", style: .Cancel, handler: { (UIAlertAction) in
+        av.addAction(UIAlertAction(title: "cancel", style: .cancel, handler: { (UIAlertAction) in
         }))
         
-        self.presentViewController(av, animated: true, completion: nil)
+        self.present(av, animated: true, completion: nil)
         
     }
 
